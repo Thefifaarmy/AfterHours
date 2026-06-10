@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>After Hours — Long Distance Edition</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-85vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+    .heart-particle {
+      position: absolute;
+      bottom: 0;
+      pointer-events: none;
+      color: rgba(244, 63, 94, 0.2);
+      animation: floatUp 6s linear infinite;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-dark {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between overflow-x-hidden select-none transition-colors duration-500 bg-slate-950 text-white">
+
+  <!-- BACKGROUND GRADIENT BLLOBS -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0" id="ambient-bg">
+    <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-br from-pink-600/20 to-purple-600/20 blur-3xl animate-pulse"></div>
+    <div class="absolute top-1/2 -right-40 w-96 h-96 rounded-full bg-gradient-to-br from-purple-600/20 to-rose-600/20 blur-3xl animate-pulse" style="animation-duration: 10s;"></div>
+    <div class="absolute -bottom-40 left-10 w-96 h-96 rounded-full bg-gradient-to-br from-indigo-600/20 to-pink-600/20 blur-3xl animate-pulse" style="animation-duration: 7s;"></div>
+    <div id="heart-container" class="absolute inset-0 overflow-hidden"></div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 transform translate-y-[-100px] opacity-0 pointer-events-none">
+    <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500 animate-pulse"></i>
+    <span id="toast-message" class="text-sm font-semibold text-white tracking-wide">Toast text</span>
+  </div>
+
+  <!-- HEADER BAR -->
+  <header class="relative z-10 px-6 py-4 flex items-center justify-between backdrop-blur-sm border-b border-white/5">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('dashboard')">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-500 p-2 rounded-xl shadow-lg">
+        <i data-lucide="heart" class="w-6 h-6 text-white fill-white"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 bg-clip-text text-transparent">
+          AFTER HOURS
+        </h1>
+        <span class="text-[10px] uppercase font-bold tracking-widest opacity-60 block" style="line-height: 1;">Long Distance</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2" id="header-controls">
+      <button onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all" aria-label="Toggle theme">
+        <i id="theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
+      </button>
+      <button onclick="navigateTo('settings')" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all" aria-label="Settings">
+        <i data-lucide="settings" class="w-4 h-4 opacity-80"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CANVAS CONTENT CONTAINER -->
+  <main class="flex-grow flex flex-col justify-center relative z-10 px-4 py-6 max-w-lg mx-auto w-full">
+    
+    <!-- ONBOARDING SCREEN -->
+    <div id="screen-onboarding" class="screen hidden w-full glass-card rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div class="text-center mb-6">
+        <span class="text-pink-500 font-semibold tracking-widest uppercase text-xs">Premium Digital Couples Deck</span>
+        <h2 class="text-3xl font-extrabold mt-1 tracking-tight">Set Your Setup</h2>
+        <p class="text-sm opacity-70 mt-2">Enter your names and relationship status to unlock personalized cards built for screen share and phone calls.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">Your Name</label>
+          <input type="text" id="input-p1" placeholder="e.g. Dylan" class="w-full bg-white/5 focus:bg-white/10 border border-white/10 focus:border-pink-500/50 rounded-2xl px-4 py-3.5 outline-none transition-all text-white placeholder:opacity-40">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">Partner's Name</label>
+          <input type="text" id="input-p2" placeholder="e.g. Chloe" class="w-full bg-white/5 focus:bg-white/10 border border-white/10 focus:border-pink-500/50 rounded-2xl px-4 py-3.5 outline-none transition-all text-white placeholder:opacity-40">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-70">Relationship Phase</label>
+          <div class="grid grid-cols-2 gap-2" id="relationship-status-options">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">Anniversary Date (Optional)</label>
+          <input type="date" id="input-anniversary" class="w-full bg-white/5 focus:bg-white/10 border border-white/10 rounded-2xl px-4 py-3.5 outline-none transition-all text-white">
+        </div>
+
+        <button onclick="submitOnboarding()" id="btn-start" class="w-full py-4 rounded-2xl font-bold text-white transition-all shadow-xl tracking-wider uppercase text-sm mt-4 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 hover:brightness-110 active:scale-95">
+          Start Premium Experience
+        </button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen hidden space-y-6">
+      <!-- Active Profile Bar -->
+      <div class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-white/10 p-2.5 rounded-full">
+            <i data-lucide="phone-call" class="w-5 h-5 text-pink-400"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm tracking-wide" id="profile-names">Dylan & Chloe</h3>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span id="profile-status" class="text-[10px] px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 font-extrabold uppercase tracking-widest">Dating</span>
+              <span id="profile-anniversary" class="text-[10px] opacity-60 flex items-center gap-1"></span>
+            </div>
+          </div>
+        </div>
+        <button onclick="editProfile()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 font-medium transition-all">Edit</button>
+      </div>
+
+      <!-- Quick Actions Grid -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="startRoulette()" class="bg-gradient-to-r from-pink-600 to-purple-600 p-4 rounded-2xl text-left border border-white/10 relative overflow-hidden group shadow-lg active:scale-95 transition-all">
+          <div class="absolute right-2 bottom-2 opacity-15 transform group-hover:scale-110 transition-transform">
+            <i data-lucide="shuffle" class="w-16 h-16 text-white"></i>
+          </div>
+          <i data-lucide="shuffle" class="w-5 h-5 mb-2 text-white"></i>
+          <h4 class="font-extrabold text-sm tracking-wide text-white">Question Roulette</h4>
+          <p class="text-[11px] text-white/70 mt-0.5">Let destiny choose a call-friendly deck.</p>
+        </button>
+
+        <button onclick="navigateTo('favorites')" class="bg-white/5 hover:bg-white/10 p-4 rounded-2xl text-left border border-white/10 relative overflow-hidden group shadow-lg active:scale-95 transition-all">
+          <div class="absolute right-2 bottom-2 opacity-10 transform group-hover:scale-110 transition-transform">
+            <i data-lucide="star" class="w-16 h-16 text-white"></i>
+          </div>
+          <i data-lucide="star" class="w-5 h-5 mb-2 text-rose-500 fill-rose-500"></i>
+          <h4 class="font-extrabold text-sm tracking-wide">Saved Cards</h4>
+          <p class="text-[11px] opacity-70 mt-0.5" id="saved-cards-count">0 prompts bookmarked.</p>
+        </button>
+      </div>
+
+      <!-- Categories Container -->
+      <div>
+        <div class="flex items-center justify-between mb-3 px-1">
+          <h3 class="text-sm font-bold uppercase tracking-widest opacity-80">Select Call Deck</h3>
+          <span id="categories-count-indicator" class="text-xs opacity-50 font-semibold">18 Categories</span>
+        </div>
+        <div class="space-y-3 max-h-[48vh] overflow-y-auto pr-1 custom-scrollbar" id="categories-list">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- GAMEPLAY CARD SCREEN -->
+    <div id="screen-game" class="screen hidden space-y-6">
+      <!-- Game Top Info Bar -->
+      <div class="flex items-center justify-between">
+        <button onclick="navigateTo('dashboard')" class="flex items-center gap-1.5 text-xs font-semibold opacity-70 hover:opacity-100 transition-all">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i> Decks
+        </button>
+        <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+          <i id="game-cat-icon" data-lucide="heart-handshake" class="w-3.5 h-3.5 text-pink-400"></i>
+          <span id="game-cat-title" class="text-[10px] font-extrabold uppercase tracking-wider">Relationship</span>
+        </div>
+        <div id="game-card-counter" class="text-xs opacity-50 font-bold">Card #1</div>
+      </div>
+
+      <!-- Main Deck Card -->
+      <div id="game-card" class="relative min-h-[42vh] rounded-3xl border flex flex-col justify-between p-8 shadow-2xl transition-all duration-700">
+        <!-- Target Banner + Star icon -->
+        <div class="flex justify-between items-start">
+          <div id="card-target-label" class="bg-pink-500/20 text-pink-300 text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border border-pink-500/30">
+            Question for Both
+          </div>
+          <button onclick="toggleCurrentFavorite()" class="p-2 rounded-full hover:bg-white/10 transition-all" aria-label="Add to favourites">
+            <i id="card-fav-star" data-lucide="star" class="w-6 h-6 transition-all opacity-40 hover:opacity-100"></i>
+          </button>
+        </div>
+
+        <!-- Central Prompt Text -->
+        <div class="my-8 text-center">
+          <p id="card-question-text" class="font-medium tracking-tight leading-relaxed text-3xl md:text-4xl">
+            "Prompt loading..."
+          </p>
+        </div>
+
+        <!-- Call reminder -->
+        <div class="text-center">
+          <span class="text-[10px] uppercase font-bold tracking-widest opacity-40">Discuss Verbally Over the Call</span>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
+      <div class="flex flex-col gap-3">
+        <div class="grid grid-cols-3 gap-2">
+          <button id="btn-prev-card" onclick="prevQuestion()" class="py-4 rounded-2xl flex items-center justify-center border bg-white/5 border-white/10 active:scale-95 transition-all">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button onclick="nextQuestion()" class="col-span-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all">
+            Next Card <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <button onclick="shuffleQuestion()" class="flex-1 bg-white/5 hover:bg-white/10 text-xs font-bold py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Skip / Shuffle
+          </button>
+          <button id="btn-spin-again" onclick="startRoulette()" class="hidden flex-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-bold py-3.5 rounded-xl border border-purple-500/25 flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Spin Again
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAVORITES SCREEN -->
+    <div id="screen-favorites" class="screen hidden space-y-4">
+      <div class="flex items-center justify-between mb-2">
+        <button onclick="navigateTo('dashboard')" class="flex items-center gap-1 text-xs font-semibold opacity-70 hover:opacity-100 transition-all">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i> Home
+        </button>
+        <h3 id="favs-title" class="font-extrabold text-sm uppercase tracking-widest">Saved Deck (0)</h3>
+      </div>
+
+      <!-- Search Filter -->
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-4 top-3.5 w-4 h-4 opacity-40"></i>
+        <input type="text" id="favs-search-input" oninput="filterFavorites(this.value)" placeholder="Search through saved prompts..." class="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-xs outline-none focus:border-pink-500/50 transition-all">
+      </div>
+
+      <!-- Scrollable list of favorites -->
+      <div id="favorites-list" class="space-y-3 max-h-[55vh] overflow-y-auto pr-1 custom-scrollbar">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="screen-settings" class="screen hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="navigateTo('dashboard')" class="flex items-center gap-1 text-xs font-semibold opacity-70 hover:opacity-100 transition-all">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i> Home
+        </button>
+        <h3 class="font-extrabold text-sm uppercase tracking-widest">Settings & Controls</h3>
+      </div>
+
+      <!-- Configuration Card -->
+      <div class="bg-white/5 border border-white/15 rounded-3xl p-6 space-y-5">
+        <!-- Card Font Size selection -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-70">Card Font Size</label>
+          <div class="grid grid-cols-4 gap-1.5 bg-white/5 p-1 rounded-xl">
+            <button onclick="setFontSize('sm')" id="font-btn-sm" class="py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">SM</button>
+            <button onclick="setFontSize('md')" id="font-btn-md" class="py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">MD</button>
+            <button onclick="setFontSize('lg')" id="font-btn-lg" class="py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">LG</button>
+            <button onclick="setFontSize('xl')" id="font-btn-xl" class="py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all">XL</button>
+          </div>
+        </div>
+
+        <!-- Haptics Toggle -->
+        <div class="flex items-center justify-between py-2 border-b border-white/5">
+          <div>
+            <h4 class="text-sm font-semibold">Vibration Feedback</h4>
+            <p class="text-[11px] opacity-60">Subtle haptic sensations on card actions</p>
+          </div>
+          <button onclick="toggleSetting('haptics')" id="toggle-haptics" class="w-12 h-6 rounded-full p-1 transition-all bg-white/10">
+            <div class="w-4 h-4 rounded-full bg-white transition-all transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <!-- Animations Toggle -->
+        <div class="flex items-center justify-between py-2 border-b border-white/5">
+          <div>
+            <h4 class="text-sm font-semibold">Atmospheric Animations</h4>
+            <p class="text-[11px] opacity-60">Floating romantic hearts & ambient glow loops</p>
+          </div>
+          <button onclick="toggleSetting('animations')" id="toggle-animations" class="w-12 h-6 rounded-full p-1 transition-all bg-white/10">
+            <div class="w-4 h-4 rounded-full bg-white transition-all transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <!-- Midnight/Dark Lock Mode -->
+        <div class="flex items-center justify-between py-2">
+          <div>
+            <h4 class="text-sm font-semibold">Midnight Theme Only</h4>
+            <p class="text-[11px] opacity-60">Locks application layout to deep dark tones</p>
+          </div>
+          <button onclick="toggleSetting('darkMode')" id="toggle-darkMode" class="w-12 h-6 rounded-full p-1 transition-all bg-white/10">
+            <div class="w-4 h-4 rounded-full bg-white transition-all transform translate-x-0"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dangerous Resets -->
+      <div class="bg-red-500/10 border border-red-500/20 rounded-3xl p-6 text-center">
+        <h4 class="text-sm font-bold text-red-400 uppercase tracking-wide">Danger Area</h4>
+        <p class="text-xs opacity-70 mt-1 mb-4">Resetting will permanently erase your personal names, custom settings, and entire saved deck folder.</p>
+        <button onclick="confirmResetAll()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all">
+          Erase All App Data
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- APP FOOTER -->
+  <footer class="relative z-10 py-6 text-center border-t border-white/5">
+    <span class="text-[10px] tracking-widest opacity-50 uppercase font-bold">
+      © <span id="current-year">2026</span> After Hours • Long Distance Relationship Decks
+    </span>
+  </footer>
+
+  <!-- DYNAMIC CORE ENGINE SCRIPTS -->
+  <script>
+    // ==========================================
+    // SEED DATABASE & TEMPLATE VARIABLES
+    // ==========================================
+    const APP_ID = 'after-hours-cards';
+
+    const CATEGORIES = [
+      { id: 'relationship', title: 'Relationship', icon: 'heart-handshake', desc: 'Strengthen your bond and dive into your unique connection.', color: 'from-pink-500 to-rose-500' },
+      { id: 'pillow_talk', title: 'Pillow Talk', icon: 'message-circle', desc: 'Cozy, romantic conversation starters perfect for winding down a call.', color: 'from-indigo-900 via-purple-900 to-slate-900', isMidnight: true },
+      { id: 'facetime_sensory', title: 'Late Night FaceTime', icon: 'eye', desc: 'Visual connection games, audio syncs, and screen-to-screen play.', color: 'from-blue-600 via-purple-800 to-indigo-950', isMidnight: true },
+      { id: 'phone_dares', title: 'Phone Dares (18+)', icon: 'zap', desc: 'Teasing microphone dares, low-whisper challenges, and screen tasks.', color: 'from-red-600 via-rose-900 to-stone-950', isAdult: true },
+      { id: 'vocal_desires', title: 'Vocal Desires (18+)', icon: 'flame', desc: 'Tease each other with what you want to do the next time you see each other.', color: 'from-red-500 via-orange-600 to-stone-900', isAdult: true },
+      { id: 'adult_photo', title: '18+ Photo Challenge', icon: 'camera', desc: 'Take and send steamy close-ups or share camera roll secrets.', color: 'from-rose-700 via-red-800 to-stone-900', isAdult: true },
+      { id: 'would_you_let', title: 'Would You Let...?', icon: 'shield-check', desc: 'Hilarious boundaries, trust tests, and silly phone permissions.', color: 'from-cyan-500 to-blue-600' },
+      { id: 'reaction_scenario', title: 'If They Did This...', icon: 'alert-triangle', desc: 'Hypothetical situations to reveal your honest reactions.', color: 'from-amber-500 to-red-500' },
+      { id: 'whats_something', title: "What's Something About...?", icon: 'eye', desc: 'Deep dive observations about habits, quirks, and traits.', color: 'from-purple-500 to-indigo-600' },
+      { id: 'photo_challenge', title: 'Photo Challenge', icon: 'camera', desc: 'Unlock memories. Search your camera roll to share on screen.', color: 'from-emerald-500 to-teal-600' },
+      { id: 'deep', title: 'Deep Thoughts', icon: 'sparkles', desc: 'Vulnerable questions to explore thoughts, fears, and dreams.', color: 'from-purple-600 to-indigo-600' },
+      { id: 'flirty', title: 'Flirty & Warm', icon: 'heart', desc: 'Cheeky, affectionate prompts to spark beautiful chemistry over the phone.', color: 'from-rose-500 to-pink-600' },
+      { id: 'future', title: 'Future & Ambitions', icon: 'milestone', desc: 'Align your long-term goals, financial dreams, and family visions.', color: 'from-emerald-500 to-teal-600' },
+      { id: 'nostalgia', title: 'Nostalgia & School', icon: 'smile', desc: 'Childhood memories, old school crushes, and growing up.', color: 'from-amber-500 to-orange-600' },
+      { id: 'travel', title: 'Travel & Adventure', icon: 'compass', desc: 'Dream roadtrips, wilderness getaways, and bucket list spots.', color: 'from-blue-500 to-indigo-600' },
+      { id: 'unpopular', title: 'Unpopular Opinions', icon: 'help-circle', desc: 'Playful arguments, food wars, and hilarious hot takes.', color: 'from-violet-500 to-fuchsia-600' },
+      { id: 'would_you_rather', title: 'Would You Rather', icon: 'layers', desc: 'Tough dilemmas and trade-offs tailored specifically for couples.', color: 'from-purple-500 to-pink-500' },
+      { id: 'how_well', title: 'How Well Do You Know Me?', icon: 'users', desc: 'Test your understanding of each other’s habits and quirks.', color: 'from-indigo-500 to-purple-500' }
+    ];
+
+    const ENGINE_DATABASE = {
+      relationship: {
+        static: [
+          { question: "What is something you hope never changes about our relationship?", target: "both" },
+          { question: "If we had a theme song that played whenever we walked into a room, what would it be?", target: "both" },
+          { question: "What was the exact moment you realized you had fallen for me?", target: "both" },
+          { question: "What is a small, quiet moment we shared that you think about often?", target: "both" }
+        ],
+        templates: [
+          "How would you describe the difference between your first impression of {other} and how you see {other} today?",
+          "If you had to choose one {location_type} to spend a quiet month with {other} with no phones, where would you go?",
+          "What is your absolute favorite memory of {other} looking completely happy or carefree?",
+          "Which of {other}'s core personal values do you respect the most?"
+        ]
+      },
+      pillow_talk: {
+        static: [
+          { question: "If we were sharing a bed tonight instead of being on this call, what position would we be falling asleep in?", target: "both" },
+          { question: "What is the most comforting thing about hearing my voice late at night?", target: "both" },
+          { question: "Describe a quiet, warm moment when you felt closer to me than ever before, despite the distance.", target: "both" }
+        ],
+        templates: [
+          "Whisper {count} things you love about {other}'s presence when we are finally together in person.",
+          "What is a soft, comforting thought about {other} that you secretly carry with you during your busy days?",
+          "If you had to describe our current phone call vibe using only {whisper_adjective} words, what would they be?"
+        ]
+      },
+      facetime_sensory: {
+        static: [
+          { question: "Let's both close our eyes right now. Count to 10 out loud, trying to stay in perfect unison without seeing each other's faces.", target: "both" },
+          { question: "Trace your finger gently on your phone screen exactly where my eyes are. Tell me what you're thinking about right now.", target: "both" },
+          { question: "Look directly into your camera without blinking, speaking, or smiling for 20 seconds. First one to break has to answer a deep question.", target: "both" }
+        ],
+        templates: [
+          "Keep your eyes closed for 30 seconds while {other} describes an incredibly detailed {sensual_focus_ld} in a slow, calm voice.",
+          "Close your eyes and listen to the tone of {other}'s voice as they whisper a {whisper_adjective} secret into the microphone.",
+          "Trace your finger along the screen where {other}'s lips are and describe exactly what you want to do the moment we see each other next."
+        ]
+      },
+      phone_dares: {
+        static: [
+          { question: "Bring your phone incredibly close to your lips and whisper your absolute favorite bedroom memory of us.", target: "both" },
+          { question: "You have 30 seconds to find the most attractive close-up selfie of me on your phone, screen-share it, and explain why you love it.", target: "both" },
+          { question: "Mute your microphone for 15 seconds, look at me on camera, and silently mouth a highly suggestive sentence. I have to guess what it is.", target: "both" }
+        ],
+        templates: [
+          "Speak in a low, seductive whisper for the next three turns. If you forget and use your normal voice, you owe {other} a photo.",
+          "Put your phone right up to your chest so {other} can hear your heartbeat, or mimic your heartbeat's speed with your fingers on camera.",
+          "Whisper a highly teasing {desire_type} into the phone so quietly that {other} has to press their ear to the speaker to hear it."
+        ]
+      },
+      vocal_desires: {
+        static: [
+          { question: "Describe, in vivid detail, the very first thing you want us to do when we are finally in the same room again.", target: "both" },
+          { question: "If you could design the perfect wake-up routine for the next time we share a bed, what would it look like?", target: "both" },
+          { question: "What is an intimate fantasy you have only ever imagined over the phone but want to try in real life?", target: "both" }
+        ],
+        templates: [
+          "Confess one secret bedroom fantasy involving {other} that you have been waiting to tell them during a late-night call.",
+          "What is a specific way {other} looks on camera when they are feeling {intimate_vibe_ld} that drives you absolutely crazy?",
+          "If you could whisper any physical command to {other} right now and have them follow it the next time you meet, what would it be?"
+        ]
+      },
+      would_you_let: {
+        static: [
+          { question: "Would you let me delete one app of my choice from your phone right now?", target: "both" },
+          { question: "Would you let me look through your camera roll without hovering over your shoulder?", target: "both" },
+          { question: "Would you let me choose a secret, funny matching tattoo for both of us to get?", target: "both" }
+        ],
+        templates: [
+          "Would {p1} let {p2} {let_action}?",
+          "If {p1} asked to {let_risky_action}, would {p2} genuinely say yes?",
+          "Would you let me spend {budget_amount} of your money on a mystery item without checking with you first?"
+        ]
+      },
+      reaction_scenario: {
+        static: [
+          { question: "If I accidentally booked a flight to the wrong city for our holiday, how would you react?", target: "both" },
+          { question: "If I woke you up at 3:00 AM completely dressed up and told you we're going on an adventure, would you get up or go back to sleep?", target: "both" }
+        ],
+        templates: [
+          "If {p1} suddenly {reaction_trigger}, what would {p2}'s honest reaction be?",
+          "Imagine {p1} surprise-gifted you with a {surprise_gift}. How would you react?",
+          "If {other} confessed that they secretly hated your absolute favorite food, how would you respond?"
+        ]
+      },
+      whats_something: {
+        static: [
+          { question: "What's something about my personality that you've only noticed recently?", target: "both" },
+          { question: "What's something about the way I handle stress that you admire?", target: "both" },
+          { question: "What's something about my style or clothes that always stands out to you?", target: "both" }
+        ],
+        templates: [
+          "What is something about {other}'s {observed_trait} that makes you feel deeply loved?",
+          "What's something about {other}'s childhood personality that you wish you could have witnessed?",
+          "What's something about the way we interact on FaceTime that you find incredibly comforting?"
+        ]
+      },
+      photo_challenge: {
+        static: [
+          { question: "Find and show the oldest selfie of us together on your phone right now.", target: "both" },
+          { question: "Find a photo on your phone that perfectly sums up our dynamic as a couple.", target: "both" },
+          { question: "Show me the last photo you took of food or drink on your phone. Why did you take it?", target: "both" }
+        ],
+        templates: [
+          "Find and show {other} {photo_challenge_type} on your camera roll.",
+          "Go to your camera roll and search for the word '{search_keyword}'. Show {other} the first photo that pops up!",
+          "Take a quick, silly candid photo of {other} right now and save it as their contact picture."
+        ]
+      },
+      adult_photo: {
+        static: [
+          { question: "Take and send a photo of your lips to me right now.", target: "both" },
+          { question: "Take and send a photo of your favorite physical feature on your own body right now.", target: "both" },
+          { question: "Take and send a photo of you looking as seductive as possible to me.", target: "both" },
+          { question: "Find and show the single most attractive, heart-racing picture you have of me saved on your phone.", target: "both" },
+          { question: "Show me a photo of yourself on your camera roll that you think is incredibly sexy but have never sent me.", target: "both" }
+        ],
+        templates: [
+          "Take and send a photo of your {body_part_spicy} to me right now.",
+          "Take and send a photo of you wearing {clothing_vibe} to me.",
+          "Take a quick, beautiful close-up photo of your eyes or neck profile on camera right now.",
+          "Show {other} {adult_photo_type} right now without hovering or looking away.",
+          "Search your camera roll for a late-night photo taken after 1:00 AM. Share the story behind it."
+        ]
+      },
+      deep: {
+        static: [
+          { question: "What is a fear you hold that you rarely talk about out loud?", target: "both" },
+          { question: "If you could look ten years into your future self, what is the single biggest question you would ask?", target: "both" }
+        ],
+        templates: [
+          "What is a piece of advice you received during your {life_era} that still influences how you make decisions today?",
+          "Which personal milestone or achievement are you currently working toward that makes you feel most alive?"
+        ]
+      },
+      flirty: {
+        static: [
+          { question: "What is something I do without realizing that you find incredibly attractive?", target: "both" },
+          { question: "If we had to spend an entire Sunday afternoon locked in our bedroom, how would we spend it?", target: "both" }
+        ],
+        templates: [
+          "If we were to plan a secret, highly romantic {date_vibe} date for this weekend, what would be the main activity?",
+          "What is a specific look or outfit of {other}'s that always drives you crazy in the best way?"
+        ]
+      },
+      future: {
+        static: [
+          { question: "Where do you honestly see us living in exactly five years from today?", target: "both" },
+          { question: "What is one professional or financial milestone you want us to conquer as a team?", target: "both" }
+        ],
+        templates: [
+          "If we could suddenly buy our dream {house_type} in {location_type} tomorrow, what is the first custom room you'd design?",
+          "What is one positive lifestyle habit you want us to build together over the next {time_period}?"
+        ]
+      },
+      nostalgia: {
+        static: [
+          { question: "What was your go-to excuse to get out of trouble when you were in school?", target: "both" },
+          { question: "Who was your absolute worst school teacher, and what did they do to earn that title?", target: "both" }
+        ],
+        templates: [
+          "What is the most rebellious thing you did during your {life_era} that your family still doesn't know about?",
+          "If you could go back and change one minor detail about your {childhood_aspect}, what would it be?"
+        ]
+      },
+      travel: {
+        static: [
+          { question: "If we could drop everything and board a flight right now, what is our destination?", target: "both" },
+          { question: "Are you more of an active outdoor explorer or a lie-by-the-pool holidaymaker?", target: "both" }
+        ],
+        templates: [
+          "If we were planning a rugged, off-grid backpacking trip through {scenic_destination}, what is the one luxury item you'd sneak into your bag?",
+          "What is your absolute favorite way to spend a quiet morning in a foreign {location_type}?"
+        ]
+      },
+      unpopular: {
+        static: [
+          { question: "Which popular movie, band, or food does everyone seem to love but you secretly hate?", target: "both" }
+        ],
+        templates: [
+          "What is a modern {media_type} trend that makes you feel completely out of touch with the world?",
+          "Which of {other}'s quirky habits do you secretly think is a bit weird, even if you find it endearing?"
+        ]
+      },
+      would_you_rather: {
+        static: [
+          { question: "Would you rather have a key to a luxury apartment in Tokyo, or a cozy off-grid cabin in the Swiss Alps?", target: "both" }
+        ],
+        templates: [
+          "Would you rather let {other} control your {media_type} accounts for a week, or your personal budget?",
+          "Would you rather spend an entire year traveling the world in a luxury RV, or have {other} cook you a gourmet dinner every night?"
+        ]
+      },
+      how_well: {
+        static: [
+          { question: "What is my absolute ultimate comfort food when I've had a difficult day?", target: "both" }
+        ],
+        templates: [
+          "Guess what {other} thinks is their own single most unique habit or personal routine.",
+          "What is {other}'s ultimate dream travel destination that they talk about at least once a month?"
+        ]
+      }
+    };
+
+    const TEMPLATE_VARIABLES = {
+      whisper_adjective: ["extremely sweet and romantic", "highly enticing", "playful and warm", "passionate", "vulnerable"],
+      sensual_focus_ld: ["lips while smiling", "slow morning routine when together", "expression when you lock eyes on camera", "warm embrace at the airport"],
+      desire_type: ["fantasy you've never mentioned", "playful late-night compliment", "cheeky prediction for the next time we meet"],
+      let_action: [
+        "shave one of your eyebrows while you sleep",
+        "choose your outfit for the next major party we attend",
+        "go through all of your direct messages with no questions asked",
+        "have full control over your Spotify playlist for a whole day",
+        "order a mystery delivery meal for you tonight and you have to eat all of it"
+      ],
+      let_risky_action: [
+        "borrow your car for an off-road road trip",
+        "post a completely random childhood photo of you on your Instagram story",
+        "permanently delete your favorite mobile game or app",
+        "cut your hair using kitchen scissors right now"
+      ],
+      budget_amount: ["£50", "£150", "£300", "£20", "£500"],
+      reaction_trigger: [
+        "surprise-booked a vacation flight that leaves in exactly 4 hours",
+        "dyed their hair a brilliant shade of neon green",
+        "accidentally dropped your phone face down on concrete",
+        "got a small tattoo of your initials on their ankle"
+      ],
+      surprise_gift: ["premium set of matching luxury gym-wear", "handcrafted album of our raw moments", "first-class weekend getaway ticket", "completely bespoke personalized piece of jewelry"],
+      observed_trait: ["daily morning routine", "unspoken habit when they are excited", "way they look at you when you walk in", "incredibly disciplined work-ethic"],
+      photo_challenge_type: [
+        "the absolute worst, most hilarious facial expression photo of them",
+        "a screenshot that perfectly explains your humor style",
+        "the most aesthetically beautiful scenic photo you took last month",
+        "the last photo on your camera roll featuring fitness or workouts"
+      ],
+      search_keyword: ["gym", "happy", "party", "night", "travel", "funny", "food"],
+      sensual_focus: ["collarbones", "hands locked with yours", "warm neck profile", "lips in mid-smile"],
+      adult_photo_type: [
+        "the most enticing picture of you wearing your absolute best outfit",
+        "a private candid photo of me that you stare at when we are apart",
+        "the last late-night image you sent me that made your heart skip a beat"
+      ],
+      body_part_spicy: [
+        "lips from a close-up angle", 
+        "collarbone with your shirt slightly pulled back", 
+        "neck profile", 
+        "wink or seductive eyes", 
+        "hands from a beautiful angle"
+      ],
+      clothing_vibe: [
+        "your most flattering outfit", 
+        "your favorite sleepwear", 
+        "something that makes you feel incredibly confident", 
+        "the outfit I find most attractive on you"
+      ],
+      location_type: ["cliffside villa in Italy", "cozy wooden cabin in Scandinavia", "hidden overwater bungalow in Bora Bora", "modern penthouse in Kyoto", "rustic stone farmhouse in Provence"],
+      anniversary_event: ["first ever official date", "first trip out of town", "most spontaneous late-night walk", "last major celebration together", "warmest memory of laughing together"],
+      life_era: ["early high school days", "most challenging transition phase", "past two years of personal growth", "childhood memories", "latest career step"],
+      childhood_aspect: ["relationship with your siblings", "oldest childhood neighborhood friends", "favorite weekend rituals", "biggest childhood dream job", "schoolyard memories"],
+      date_vibe: ["candlelit, dressed-up", "cozy, rain-slicked indoor", "spontaneous road-trip style", "midnight picnic under the stars", "high-end culinary exploration"],
+      count: ["exactly three", "only five", "just four", "exactly two", "seven distinct"],
+      media_type: ["Spotify playlists", "Instagram direct messages", "Netflix viewing history", "YouTube recommended feed", "camera roll"],
+      adjective_count: ["three highly descriptive", "two intense", "four playful", "three sensual"],
+      gift_type: ["perfectly curated vintage vinyl record", "handwritten book of shared memories", "spontaneous flight ticket to Europe", "gourmet dessert made from scratch", "bespoke piece of jewelry"],
+      intimate_vibe_ld: ["winding down late at night on FaceTime", "cuddling early in the morning on call", "stealing a quiet moment away to talk to you"],
+      house_type: ["glass-walled architectural masterpiece", "cozy stone cabin with a giant fireplace", "sleek, ultra-modern downtown penthouse", "spacious beachfront loft with sunset views"],
+      time_period: ["six months", "three years", "five years", "twelve months"],
+      scenic_destination: ["the rugged coastlines of Scotland", "the deep tropical rainforests of Costa Rica", "the gorgeous winding fjords of Norway", "the high-altitude peaks of the Andes"]
+    };
+
+    // ==========================================
+    // APP STATE MANAGEMENT
+    // ==========================================
+    let state = {
+      names: { p1: '', p2: '' },
+      relationship: { status: 'Dating', anniversary: '' },
+      settings: { haptics: true, animations: true, darkMode: true, fontSize: 'lg' },
+      favorites: [],
+      currentScreen: 'onboarding',
+      currentCategory: null,
+      currentQuestion: null,
+      deckHistory: [],
+      deckHistoryIndex: -1
+    };
+
+    // --- Bootstrapper ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      initUI();
+      initFloatingHearts();
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+    });
+
+    function loadState() {
+      const namesSaved = localStorage.getItem(`${APP_ID}:names`);
+      const relSaved = localStorage.getItem(`${APP_ID}:relationship`);
+      const settingsSaved = localStorage.getItem(`${APP_ID}:settings`);
+      const favSaved = localStorage.getItem(`${APP_ID}:favorites`);
+
+      if (namesSaved) state.names = JSON.parse(namesSaved);
+      if (relSaved) state.relationship = JSON.parse(relSaved);
+      if (settingsSaved) state.settings = JSON.parse(settingsSaved);
+      if (favSaved) state.favorites = JSON.parse(favSaved);
+
+      // Route screen based on setup completion
+      if (state.names.p1 && state.names.p2) {
+        state.currentScreen = 'dashboard';
+      } else {
+        state.currentScreen = 'onboarding';
+      }
+    }
+
+    function saveState(key, data) {
+      localStorage.setItem(`${APP_ID}:${key}`, JSON.stringify(data));
+    }
+
+    // --- UI INITS ---
+    function initUI() {
+      applyThemeSettings();
+      renderRelationshipStatusOptions();
+      updateDashboardData();
+      renderCategories();
+      navigateTo(state.currentScreen);
+    }
+
+    function triggerHaptic() {
+      if (state.settings.haptics && navigator.vibrate) {
+        navigator.vibrate(25);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = msg;
+      
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    // --- NAVIGATION CONTROLLER ---
+    function navigateTo(screenId) {
+      state.currentScreen = screenId;
+      document.querySelectorAll('.screen').forEach(scr => scr.classList.add('hidden'));
+      
+      const targetScreen = document.getElementById(`screen-${screenId}`);
+      if (targetScreen) targetScreen.classList.remove('hidden');
+
+      // Toggle Header visibility logic
+      const headerControls = document.getElementById('header-controls');
+      if (screenId === 'onboarding') {
+        headerControls.classList.add('hidden');
+        // Populate inputs from state if any
+        document.getElementById('input-p1').value = state.names.p1;
+        document.getElementById('input-p2').value = state.names.p2;
+        document.getElementById('input-anniversary').value = state.relationship.anniversary;
+      } else {
+        headerControls.classList.remove('hidden');
+      }
+
+      if (screenId === 'dashboard') {
+        updateDashboardData();
+      }
+
+      if (screenId === 'favorites') {
+        renderFavorites();
+      }
+
+      if (screenId === 'settings') {
+        syncSettingsUI();
+      }
+
+      triggerHaptic();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- ONBOARDING ACTIONS ---
+    function renderRelationshipStatusOptions() {
+      const options = ['Dating', 'Talking Stage', 'Married', 'Engaged', 'Custom'];
+      const container = document.getElementById('relationship-status-options');
+      container.innerHTML = options.map(opt => `
+        <button onclick="setRelationshipStatus('${opt}')" id="rel-opt-${opt.replace(' ', '')}" class="py-2 px-3 text-xs font-semibold rounded-xl border transition-all bg-white/5 border-white/10 hover:bg-white/10 text-white/80">
+          ${opt}
+        </button>
+      `).join('');
+      updateRelationshipStatusButtonUI();
+    }
+
+    function setRelationshipStatus(status) {
+      triggerHaptic();
+      state.relationship.status = status;
+      updateRelationshipStatusButtonUI();
+    }
+
+    function updateRelationshipStatusButtonUI() {
+      document.querySelectorAll('#relationship-status-options button').forEach(btn => {
+        btn.className = "py-2 px-3 text-xs font-semibold rounded-xl border transition-all bg-white/5 border-white/10 hover:bg-white/10 text-white/80";
+      });
+      const selectedBtn = document.getElementById(`rel-opt-${state.relationship.status.replace(' ', '')}`);
+      if (selectedBtn) {
+        selectedBtn.className = "py-2 px-3 text-xs font-semibold rounded-xl border transition-all bg-gradient-to-r from-pink-500 to-rose-500 border-transparent text-white shadow-lg";
+      }
+    }
+
+    function submitOnboarding() {
+      const p1 = document.getElementById('input-p1').value.trim();
+      const p2 = document.getElementById('input-p2').value.trim();
+      const anniversary = document.getElementById('input-anniversary').value;
+
+      if (!p1 || !p2) {
+        showToast("Please enter both names to start! ❤️");
+        return;
+      }
+
+      state.names = { p1, p2 };
+      state.relationship.anniversary = anniversary;
+      
+      saveState('names', state.names);
+      saveState('relationship', state.relationship);
+
+      showToast("Welcome to After Hours! ❤️");
+      navigateTo('dashboard');
+    }
+
+    // --- DASHBOARD ACTIONS ---
+    function updateDashboardData() {
+      document.getElementById('profile-names').textContent = `${state.names.p1} & ${state.names.p2}`;
+      document.getElementById('profile-status').textContent = state.relationship.status;
+      
+      const profileAnniversary = document.getElementById('profile-anniversary');
+      if (state.relationship.anniversary) {
+        profileAnniversary.innerHTML = `<i data-lucide="calendar" class="w-3 h-3"></i> Since ${new Date(state.relationship.anniversary).toLocaleDateString()}`;
+      } else {
+        profileAnniversary.innerHTML = '';
+      }
+      
+      document.getElementById('saved-cards-count').textContent = `${state.favorites.length} prompts bookmarked.`;
+      lucide.createIcons();
+    }
+
+    function editProfile() {
+      navigateTo('onboarding');
+    }
+
+    function renderCategories() {
+      const container = document.getElementById('categories-list');
+      container.innerHTML = CATEGORIES.map(cat => `
+        <button onclick="startCategoryDeck('${cat.id}')" class="w-full text-left bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 p-4 rounded-2xl flex items-center justify-between transition-all group active:scale-95 shadow-md">
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-xl bg-gradient-to-tr ${cat.color} shadow-lg text-white">
+              <i data-lucide="${cat.icon}" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-base tracking-wide flex items-center gap-1.5">
+                ${cat.title}
+                ${cat.isMidnight ? `<span class="bg-indigo-500/20 text-indigo-300 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Night Call</span>` : ''}
+                ${cat.isAdult ? `<span class="bg-red-500/20 text-red-300 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse">Spicy</span>` : ''}
+              </h4>
+              <p class="text-xs opacity-60 mt-1 line-clamp-1 pr-6">${cat.desc}</p>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+        </button>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // --- DYNAMIC QUESTION PROMPT GENERATION ENGINE ---
+    function generatePrompt(categoryKey) {
+      const catData = ENGINE_DATABASE[categoryKey] || ENGINE_DATABASE['relationship'];
+      const isTemplate = Math.random() > 0.45 && catData.templates.length > 0;
+      let rawText = "";
+      let target = "both";
+
+      if (isTemplate) {
+        const template = catData.templates[Math.floor(Math.random() * catData.templates.length)];
+        let processed = template;
+        
+        processed = processed.replace(/{p1}/g, state.names.p1 || "Player 1");
+        processed = processed.replace(/{p2}/g, state.names.p2 || "Player 2");
+        
+        if (processed.includes("{other}")) {
+          const turn = Math.random() > 0.5 ? 'p1' : 'p2';
+          processed = processed.replace(/{other}/g, turn === 'p1' ? state.names.p1 : state.names.p2);
+          target = turn === 'p1' ? 'p2' : 'p1';
+        }
+
+        Object.keys(TEMPLATE_VARIABLES).forEach(vKey => {
+          const regex = new RegExp(`{${vKey}}`, 'g');
+          if (processed.match(regex)) {
+            const varChoices = TEMPLATE_VARIABLES[vKey];
+            const choice = varChoices[Math.floor(Math.random() * varChoices.length)];
+            processed = processed.replace(regex, choice);
+          }
+        });
+
+        rawText = processed;
+      } else {
+        const item = catData.static[Math.floor(Math.random() * catData.static.length)];
+        rawText = item.question;
+        target = item.target;
+      }
+
+      let targetLabel = "Question for Both";
+      if (target === 'p1') {
+        targetLabel = `Question for ${state.names.p1}`;
+      } else if (target === 'p2') {
+        targetLabel = `Question for ${state.names.p2}`;
+      } else if (target === 'male' || target === 'female') {
+        const assign = Math.random() > 0.5 ? state.names.p1 : state.names.p2;
+        targetLabel = `Question for ${assign}`;
+      }
+
+      return {
+        id: `${categoryKey}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        category: categoryKey,
+        question: rawText,
+        targetLabel: targetLabel,
+        difficulty: 'Medium'
+      };
+    }
+
+    // --- GAMEPLAY CORE CONTROLLER ---
+    function startCategoryDeck(catId) {
+      triggerHaptic();
+      const cat = CATEGORIES.find(c => c.id === catId);
+      state.currentCategory = cat;
+      
+      const firstPrompt = generatePrompt(catId);
+      state.deckHistory = [firstPrompt];
+      state.deckHistoryIndex = 0;
+      state.currentQuestion = firstPrompt;
+      
+      document.getElementById('btn-spin-again').classList.add('hidden');
+      updateGameplayUI();
+      navigateTo('game');
+    }
+
+    function startRoulette() {
+      triggerHaptic();
+      const randomCat = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+      state.currentCategory = randomCat;
+      
+      const prompt = generatePrompt(randomCat.id);
+      state.currentQuestion = prompt;
+      state.deckHistory = [prompt];
+      state.deckHistoryIndex = 0;
+
+      document.getElementById('btn-spin-again').classList.remove('hidden');
+      updateGameplayUI();
+      navigateTo('game');
+    }
+
+    function updateGameplayUI() {
+      const cat = state.currentCategory;
+      const q = state.currentQuestion;
+
+      // Update Top Nav
+      document.getElementById('game-cat-title').textContent = cat.title;
+      const topIcon = document.getElementById('game-cat-icon');
+      topIcon.setAttribute('data-lucide', cat.icon);
+      
+      document.getElementById('game-card-counter').textContent = `Card #${state.deckHistoryIndex + 1}`;
+
+      // Update Card Visual Style Based on Category Meta Attributes
+      const card = document.getElementById('game-card');
+      card.className = "relative min-h-[42vh] rounded-3xl border flex flex-col justify-between p-8 shadow-2xl transition-all duration-700";
+      
+      if (cat.isMidnight) {
+        card.classList.add('from-indigo-950', 'via-purple-900', 'to-slate-950', 'border-purple-500/30', 'text-white', 'bg-gradient-to-br');
+      } else if (cat.isAdult) {
+        card.classList.add('from-stone-950', 'via-rose-950', 'to-stone-900', 'border-red-500/30', 'text-white', 'bg-gradient-to-br');
+      } else {
+        card.classList.add('from-white/10', 'to-white/5', 'backdrop-blur-xl', 'border-white/10', 'bg-gradient-to-br');
+      }
+
+      // Update Prompt and Target Banner Text
+      document.getElementById('card-target-label').textContent = q.targetLabel;
+      document.getElementById('card-question-text').textContent = `"${q.question}"`;
+
+      // Update Favorite Icon
+      const starIcon = document.getElementById('card-fav-star');
+      const isFav = state.favorites.some(f => f.question === q.question);
+      if (isFav) {
+        starIcon.className = "w-6 h-6 transition-all text-amber-400 fill-amber-400 scale-110";
+      } else {
+        starIcon.className = "w-6 h-6 transition-all opacity-40 hover:opacity-100 text-white";
+      }
+
+      // Update Prev Button disabled status
+      const prevBtn = document.getElementById('btn-prev-card');
+      if (state.deckHistoryIndex <= 0) {
+        prevBtn.classList.add('opacity-20', 'cursor-not-allowed');
+        prevBtn.setAttribute('disabled', 'true');
+      } else {
+        prevBtn.classList.remove('opacity-20', 'cursor-not-allowed');
+        prevBtn.removeAttribute('disabled');
+      }
+
+      applyFontSize();
+      lucide.createIcons();
+    }
+
+    function nextQuestion() {
+      triggerHaptic();
+      if (state.deckHistoryIndex < state.deckHistory.length - 1) {
+        state.deckHistoryIndex++;
+        state.currentQuestion = state.deckHistory[state.deckHistoryIndex];
+      } else {
+        const newPrompt = generatePrompt(state.currentCategory.id);
+        state.deckHistory.push(newPrompt);
+        state.deckHistoryIndex = state.deckHistory.length - 1;
+        state.currentQuestion = newPrompt;
+      }
+      updateGameplayUI();
+    }
+
+    function prevQuestion() {
+      if (state.deckHistoryIndex > 0) {
+        triggerHaptic();
+        state.deckHistoryIndex--;
+        state.currentQuestion = state.deckHistory[state.deckHistoryIndex];
+        updateGameplayUI();
+      }
+    }
+
+    function shuffleQuestion() {
+      triggerHaptic();
+      const fresh = generatePrompt(state.currentCategory.id);
+      state.currentQuestion = fresh;
+      state.deckHistory.push(fresh);
+      state.deckHistoryIndex = state.deckHistory.length - 1;
+      updateGameplayUI();
+    }
+
+    function toggleCurrentFavorite() {
+      triggerHaptic();
+      const q = state.currentQuestion;
+      const isFav = state.favorites.some(f => f.question === q.question);
+      
+      if (isFav) {
+        state.favorites = state.favorites.filter(f => f.question !== q.question);
+        showToast('Removed from Favourites');
+      } else {
+        const newFav = {
+          ...q,
+          savedAt: new Date().toLocaleDateString(),
+          categoryTitle: CATEGORIES.find(c => c.id === q.category)?.title || 'Custom'
+        };
+        state.favorites.unshift(newFav);
+        showToast('Added to Favourites! ❤️');
+      }
+      
+      saveState('favorites', state.favorites);
+      updateGameplayUI();
+    }
+
+    // --- FAVORITES SCREEN INTERACTIONS ---
+    function renderFavorites(query = '') {
+      const list = document.getElementById('favorites-list');
+      const filtered = state.favorites.filter(f => f.question.toLowerCase().includes(query.toLowerCase()));
+      
+      document.getElementById('favs-title').textContent = `Saved Deck (${state.favorites.length})`;
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-12 bg-white/5 border border-white/5 rounded-2xl">
+            <i data-lucide="bookmark" class="w-8 h-8 mx-auto mb-2 opacity-30 text-pink-400"></i>
+            <p class="text-sm opacity-60">No saved cards match your search.</p>
+          </div>
+        `;
+      } else {
+        list.innerHTML = filtered.map(item => `
+          <div class="p-4 bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl flex items-start justify-between gap-3 transition-all">
+            <div class="flex-1">
+              <span class="text-[9px] bg-white/10 text-white/75 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">
+                ${item.categoryTitle}
+              </span>
+              <p class="text-sm font-medium tracking-wide leading-relaxed">
+                "${item.question}"
+              </p>
+            </div>
+            <div class="flex flex-col gap-1 items-end">
+              <button onclick="playSavedCard('${item.id}')" class="bg-pink-500/20 text-pink-300 text-[10px] font-bold px-2.5 py-1 rounded-lg hover:bg-pink-500/30 transition-all">
+                Play Card
+              </button>
+              <button onclick="removeFavoriteCard('${item.id}')" class="p-1.5 rounded-lg hover:bg-white/10 text-rose-500 transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function filterFavorites(value) {
+      renderFavorites(value);
+    }
+
+    function playSavedCard(cardId) {
+      triggerHaptic();
+      const card = state.favorites.find(f => f.id === cardId);
+      if (card) {
+        state.currentCategory = CATEGORIES.find(c => c.id === card.category) || CATEGORIES[0];
+        state.currentQuestion = card;
+        state.deckHistory = [card];
+        state.deckHistoryIndex = 0;
+        
+        document.getElementById('btn-spin-again').classList.add('hidden');
+        updateGameplayUI();
+        navigateTo('game');
+      }
+    }
+
+    function removeFavoriteCard(cardId) {
+      triggerHaptic();
+      state.favorites = state.favorites.filter(f => f.id !== cardId);
+      saveState('favorites', state.favorites);
+      renderFavorites(document.getElementById('favs-search-input').value);
+      showToast('Removed from Favourites');
+    }
+
+    // --- SETTINGS CONTROLLER ---
+    function syncSettingsUI() {
+      // Font Buttons
+      document.querySelectorAll('[id^="font-btn-"]').forEach(btn => {
+        btn.className = "py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all hover:bg-white/5 opacity-60";
+      });
+      const activeFontBtn = document.getElementById(`font-btn-${state.settings.fontSize}`);
+      if (activeFontBtn) {
+        activeFontBtn.className = "py-1.5 text-xs font-bold rounded-lg uppercase tracking-wider transition-all bg-gradient-to-r from-pink-500 to-rose-500 text-white";
+      }
+
+      // Switches
+      updateSwitchUI('haptics');
+      updateSwitchUI('animations');
+      updateSwitchUI('darkMode');
+    }
+
+    function updateSwitchUI(key) {
+      const toggle = document.getElementById(`toggle-${key}`);
+      const dot = toggle.querySelector('div');
+      
+      if (state.settings[key]) {
+        toggle.className = "w-12 h-6 rounded-full p-1 transition-all bg-pink-500";
+        dot.className = "w-4 h-4 rounded-full bg-white transition-all transform translate-x-6";
+      } else {
+        toggle.className = "w-12 h-6 rounded-full p-1 transition-all bg-white/10";
+        dot.className = "w-4 h-4 rounded-full bg-white transition-all transform translate-x-0";
+      }
+    }
+
+    function setFontSize(size) {
+      triggerHaptic();
+      state.settings.fontSize = size;
+      saveState('settings', state.settings);
+      syncSettingsUI();
+    }
+
+    function applyFontSize() {
+      const txt = document.getElementById('card-question-text');
+      txt.className = "font-medium tracking-tight leading-relaxed text-center w-full";
+      
+      switch (state.settings.fontSize) {
+        case 'sm': txt.classList.add('text-xl', 'md:text-2xl'); break;
+        case 'md': txt.classList.add('text-2xl', 'md:text-3xl'); break;
+        case 'lg': txt.classList.add('text-3xl', 'md:text-4xl'); break;
+        case 'xl': txt.classList.add('text-4xl', 'md:text-5xl'); break;
+      }
+    }
+
+    function toggleSetting(key) {
+      triggerHaptic();
+      state.settings[key] = !state.settings[key];
+      saveState('settings', state.settings);
+      syncSettingsUI();
+      applyThemeSettings();
+    }
+
+    function applyThemeSettings() {
+      // Update body background lock state
+      const body = document.body;
+      const themeIcon = document.getElementById('theme-icon');
+      
+      if (state.settings.darkMode) {
+        body.className = "min-h-screen relative flex flex-col justify-between overflow-x-hidden select-none transition-colors duration-500 bg-slate-950 text-white";
+        themeIcon.setAttribute('data-lucide', 'sun');
+        themeIcon.className.baseVal = "w-4 h-4 text-amber-400";
+      } else {
+        body.className = "min-h-screen relative flex flex-col justify-between overflow-x-hidden select-none transition-colors duration-500 bg-rose-50 text-slate-900";
+        themeIcon.setAttribute('data-lucide', 'moon');
+        themeIcon.className.baseVal = "w-4 h-4 text-indigo-700";
+      }
+      lucide.createIcons();
+    }
+
+    function toggleTheme() {
+      toggleSetting('darkMode');
+    }
+
+    function confirmResetAll() {
+      triggerHaptic();
+      if (confirm("Are you absolutely sure you want to clear all your saved settings and favourites?")) {
+        localStorage.clear();
+        state = {
+          names: { p1: '', p2: '' },
+          relationship: { status: 'Dating', anniversary: '' },
+          settings: { haptics: true, animations: true, darkMode: true, fontSize: 'lg' },
+          favorites: [],
+          currentScreen: 'onboarding',
+          currentCategory: null,
+          currentQuestion: null,
+          deckHistory: [],
+          deckHistoryIndex: -1
+        };
+        initUI();
+        showToast('All data successfully cleared');
+      }
+    }
+
+    // --- VISUAL AMBIENT PARTICLE ENGINE ---
+    function initFloatingHearts() {
+      const container = document.getElementById('heart-container');
+      
+      setInterval(() => {
+        if (!state.settings.animations) return;
+        
+        const heart = document.createElement('div');
+        heart.className = 'heart-particle';
+        heart.textContent = '♥';
+        
+        const xPos = Math.random() * 100;
+        const size = Math.random() * 15 + 10;
+        const duration = Math.random() * 6 + 4;
+        const delay = Math.random() * 2;
+        
+        heart.style.left = `${xPos}%`;
+        heart.style.fontSize = `${size}px`;
+        heart.style.animation = `floatUp ${duration}s linear infinite`;
+        heart.style.animationDelay = `${delay}s`;
+        
+        container.appendChild(heart);
+        
+        // Cleanup old hearts
+        setTimeout(() => {
+          heart.remove();
+        }, (duration + delay) * 1000);
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
+
+```
